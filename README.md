@@ -3,7 +3,7 @@ Create time-slice images with Python
 
 Prerequisites:
 - NumPy
-- SciPy
+- imageio
 
 The class 'TimeSlice' in 'tslice.py' is constructed with a directory path which should contain a sequence of photos in name-order. Other options are explained within the code itself.
 
