@@ -7,12 +7,12 @@ Feel free to take, use, fix, hack etc.
 
 import glob
 import numpy as np
-from scipy import misc
+import imageio
 
 
 class TimeSlice:
 
-    def __init__(self, filePath, fileExt, imRotate=None, verbose=False):
+    def __init__(self, filePath, fileExt, imRotate=0, verbose=False):
         """Creates a sorted list of file paths for the given extension, in the
         given directory. These are the files used for slicing operations. It's
         assumed that they are named in order.
@@ -42,9 +42,9 @@ class TimeSlice:
         self.files = sorted(glob.glob(self.filePath + '*' + self.fileExt))
         self.numFiles = len(self.files)
         if verbose:
-            print "Found %d %s files in dir %s" % (self.numFiles,
+            print("Found %d %s files in dir %s" % (self.numFiles,
                                                    self.fileExt,
-                                                   self.filePath)
+                                                   self.filePath))
 
     def slice(self, interval=1, outfile="out.jpg", sliceDir=0, trim=(0,0,0,0),
         borderWidth=0, borderCol=(128,128,128), verbose=False):
@@ -84,11 +84,11 @@ class TimeSlice:
             raise IndexError("Invalid number of trim parameters")
 
         numSlices = int(self.numFiles / interval)
-        if verbose:  print "Number of slices: %i" % numSlices
+        if verbose:  print("Number of slices: %i" % numSlices)
 
-        im_temp = misc.imread(self.files[0])
+        im_temp = imageio.imread(self.files[0])
 
-        if self.imRotate != None:
+        if self.imRotate != 0:
             if self.imRotate == 90:
                 im_temp = np.rot90(im_temp,1)
             if self.imRotate == 180:
@@ -110,21 +110,21 @@ class TimeSlice:
         del im_temp
 
         if verbose:
-            print "Slice width is", sliceWidth, "px"
-            print "Output image size is %i x %i px" % (imShape_ij[1],
-                                                       imShape_ij[0])
+            print("Slice width is", sliceWidth, "px")
+            print("Output image size is %i x %i px" % (imShape_ij[1],
+                                                       imShape_ij[0]))
         
         for i in range(numSlices):
-            if verbose:  print "Slicing image %i of %i..." % (i+1, numSlices)
+            if verbose:  print("Slicing image %i of %i..." % (i+1, numSlices))
 
-            im_this = misc.imread(self.files[i*interval])
+            im_this = imageio.imread(self.files[i*interval])
 
             if verbose:
-                print "Image number is %i of %i" % ((i*interval)+1,
-                                                    self.numFiles)
-                print "Image file path is %s" % self.files[i*interval]
+                print("Image number is %i of %i" % ((i*interval)+1,
+                                                    self.numFiles))
+                print("Image file path is %s" % self.files[i*interval])
 
-            if self.imRotate != None:
+            if self.imRotate != 0:
                 if self.imRotate == 90:
                     im_this = np.rot90(im_this,1)
                 if self.imRotate == 180:
@@ -165,14 +165,14 @@ class TimeSlice:
                 im_slice[im_slice.shape[0]-borderWidth:im_slice.shape[0],:] \
                     = borderCol
                 im_slice[:,0:0+borderWidth] = borderCol
-                im_slice[:,im_slice.shape[0]-borderWidth:im_slice.shape[1]] \
+                im_slice[:,im_slice.shape[1]-borderWidth:im_slice.shape[1]] \
                     = borderCol
 
             im_main[slice_TL_i:slice_BR_i+1,slice_TL_j:slice_BR_j+1] = im_slice
             del im_slice
 
-        if verbose:  print "Saving output image to \"%s\"..." % outfile
+        if verbose:  print("Saving output image to \"%s\"..." % outfile)
 
-        misc.imsave(outfile, im_main)
+        imageio.imsave(outfile, im_main)
 
-        if verbose:  print "Done"
+        if verbose:  print("Done")
